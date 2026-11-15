@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ImgShare – Chia sẻ ảnh</title>
+<style>
+:root{--bg:#0f1115;--card:#171a21;--line:#262b36;--text:#e8eaf0;--mute:#8b93a7;--acc:#4f8cff;--ok:#2ecc8f;--err:#ff5d6c}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+header{padding:18px 24px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}
+header a{color:var(--text);text-decoration:none;font-weight:700;font-size:18px;display:flex;align-items:center;gap:8px}
+main{flex:1;width:100%;max-width:880px;margin:0 auto;padding:40px 20px}
+h1{font-size:28px;margin-bottom:6px}.sub{color:var(--mute);margin-bottom:28px}
+.drop{border:2px dashed var(--line);border-radius:16px;background:var(--card);padding:56px 20px;text-align:center;cursor:pointer;transition:.2s}
+.drop:hover,.drop.over{border-color:var(--acc);background:#1b2030}
+.drop svg{color:var(--acc);margin-bottom:12px}.drop b{display:block;font-size:17px;margin-bottom:6px}.drop span{color:var(--mute);font-size:14px}
+.preview{margin-top:20px;display:none;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;gap:16px;align-items:center}
+.preview img{width:96px;height:96px;object-fit:cover;border-radius:10px;background:#000}
+.meta{flex:1;min-width:0}.meta .n{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.meta .s{color:var(--mute);font-size:13px;margin-top:4px}
+.bar{height:6px;background:var(--line);border-radius:6px;margin-top:10px;overflow:hidden}.bar i{display:block;height:100%;width:0;background:var(--acc);transition:width .2s}
+button{font:inherit;border:0;border-radius:10px;padding:10px 18px;font-weight:600;cursor:pointer;background:var(--acc);color:#fff}
+button.ghost{background:transparent;border:1px solid var(--line);color:var(--text)}button:disabled{opacity:.5;cursor:default}
+.result{margin-top:20px;display:none;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px}
+.result .ok{color:var(--ok);font-weight:600;margin-bottom:12px}
+.row{display:flex;gap:8px;margin-top:8px}.row input{flex:1;min-width:0;background:#0b0d11;border:1px solid var(--line);border-radius:10px;padding:10px 12px;color:var(--text);font:inherit;font-size:14px}
+.label{font-size:13px;color:var(--mute);margin-top:14px}
+.msg{margin-top:14px;color:var(--err);display:none}
+/* Trang xem */
+.viewer{display:none;text-align:center}
+.frame{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;display:inline-block;max-width:100%;box-shadow:0 20px 60px rgba(0,0,0,.45)}
+.frame img{display:block;max-width:100%;max-height:75vh;border-radius:10px;cursor:zoom-in;opacity:0;transition:opacity .4s}
+.frame img.on{opacity:1}
+.tools{margin-top:18px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.tools a{text-decoration:none}
+.idtag{color:var(--mute);font-size:13px;margin-top:12px}
+.spin{width:36px;height:36px;border:3px solid var(--line);border-top-color:var(--acc);border-radius:50%;animation:r 1s linear infinite;margin:60px auto}
+@keyframes r{to{transform:rotate(360deg)}}
+.lb{position:fixed;inset:0;background:rgba(0,0,0,.92);display:none;align-items:center;justify-content:center;z-index:9;cursor:zoom-out}
+.lb img{max-width:96vw;max-height:96vh}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--ok);color:#06281b;padding:10px 18px;border-radius:10px;font-weight:600;opacity:0;transition:.3s;pointer-events:none}
+.toast.on{opacity:1}
+footer{text-align:center;color:var(--mute);font-size:13px;padding:20px}
+</style>
+</head>
+<body>
+<header><a href="/"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#4f8cff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>ImgShare</a></header>
+<main>
+  <!-- Trang tải lên -->
+  <section id="up">
+    <h1>Chia sẻ ảnh nhanh</h1>
+    <p class="sub">Kéo thả, dán (Ctrl+V) hoặc chọn ảnh để nhận link chia sẻ ngay.</p>
+    <label class="drop" id="drop">
+      <input type="file" id="file" accept="image/*" hidden>
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg>
+      <b>Kéo thả ảnh vào đây hoặc bấm để chọn</b>
+      <span>JPG, PNG, GIF, WEBP, BMP · Tối đa 32MB</span>
+    </label>
+    <div class="preview" id="pv">
+      <img id="pvImg" alt="">
+      <div class="meta"><div class="n" id="pvName"></div><div class="s" id="pvSize"></div><div class="bar"><i id="prog"></i></div></div>
+      <button id="btnUp">Tải lên</button>
+    </div>
+    <p class="msg" id="msg"></p>
+    <div class="result" id="res">
+      <div class="ok">✓ Tải lên thành công</div>
+      <div class="label">Link xem ảnh</div>
+      <div class="row"><input id="lkView" readonly><button data-c="lkView">Sao chép</button></div>
+      <div class="label">ID ảnh</div>
+      <div class="row"><input id="lkId" readonly><button class="ghost" data-c="lkId">Sao chép</button></div>
+      <div class="label">Link ảnh trực tiếp</div>
+      <div class="row"><input id="lkDirect" readonly><button class="ghost" data-c="lkDirect">Sao chép</button></div>
+      <div class="tools" style="justify-content:flex-start"><a id="open" target="_blank"><button>Mở trang xem</button></a><button class="ghost" onclick="location.href='/'">Tải ảnh khác</button></div>
+    </div>
+  </section>
+
+  <!-- Trang xem ảnh -->
+  <section class="viewer" id="view">
+    <div class="spin" id="spin"></div>
+    <div class="frame" id="frame" style="display:none"><img id="vImg" alt="Ảnh được chia sẻ"></div>
+    <div class="idtag" id="vId"></div>
+    <div class="tools" id="vTools" style="display:none">
+      <button id="vCopy">Sao chép link</button>
+      <a id="vDirect" target="_blank"><button class="ghost">Mở ảnh gốc</button></a>
+      <a id="vDl" download><button class="ghost">Tải xuống</button></a>
+      <a href="/"><button class="ghost">Tải ảnh của bạn</button></a>
+    </div>
+    <p class="msg" id="vMsg"></p>
+  </section>
+</main>
+<div class="lb" id="lb"><img id="lbImg" alt=""></div>
+<div class="toast" id="toast">Đã sao chép</div>
+<footer>Lưu trữ bởi ImgBB · Chạy trên Cloudflare Pages</footer>
+<script>
+const $=id=>document.getElementById(id);
+const fmt=b=>b>1048576?(b/1048576).toFixed(2)+' MB':(b/1024).toFixed(1)+' KB';
+const toast=t=>{$('toast').textContent=t;$('toast').classList.add('on');setTimeout(()=>$('toast').classList.remove('on'),1600)};
+const copy=v=>navigator.clipboard.writeText(v).then(()=>toast('Đã sao chép'));
+const q=new URLSearchParams(location.search), ID=q.get('id');
+
+if(ID){ // ===== Chế độ xem ảnh =====
+  $('up').style.display='none';$('view').style.display='block';
+  const show=src=>{
+    const img=$('vImg');
+    img.onload=()=>{$('spin').style.display='none';$('frame').style.display='inline-block';$('vTools').style.display='flex';requestAnimationFrame(()=>img.classList.add('on'))};
+    img.onerror=()=>fail('Không tải được ảnh.');
+    img.src=src;$('vDirect').href=src;$('vDl').href=src;$('vId').textContent='ID: '+ID;
+    $('lbImg').src=src;document.title='Ảnh '+ID+' – ImgShare';
+  };
+  const fail=m=>{$('spin').style.display='none';$('vMsg').textContent=m;$('vMsg').style.display='block'};
+  const p=q.get('i');
+  if(p && /^[\w\-.%]+\/[\w\-.%]+$/.test(p)) show('https://i.ibb.co/'+p);
+  else fetch('/api/image?id='+encodeURIComponent(ID)).then(r=>r.json()).then(d=>d.url?show(d.url):fail(d.error||'Không tìm thấy ảnh')).catch(()=>fail('Lỗi kết nối'));
+  $('vCopy').onclick=()=>copy(location.href);
+  $('vImg').onclick=()=>$('lb').style.display='flex';
+  $('lb').onclick=()=>$('lb').style.display='none';
+} else { // ===== Chế độ tải lên =====
+  let file=null;
+  const pick=f=>{
+    if(!f||!f.type.startsWith('image/'))return err('Vui lòng chọn file ảnh.');
+    if(f.size>32*1048576)return err('Ảnh vượt quá 32MB.');
+    file=f;err('');$('res').style.display='none';
+    $('pvImg').src=URL.createObjectURL(f);$('pvName').textContent=f.name||'clipboard.png';$('pvSize').textContent=fmt(f.size);
+    $('prog').style.width='0';$('btnUp').disabled=false;$('pv').style.display='flex';
+  };
+  const err=m=>{$('msg').textContent=m;$('msg').style.display=m?'block':'none'};
+  $('file').onchange=e=>pick(e.target.files[0]);
+  const d=$('drop');
+  ['dragenter','dragover'].forEach(e=>d.addEventListener(e,ev=>{ev.preventDefault();d.classList.add('over')}));
+  ['dragleave','drop'].forEach(e=>d.addEventListener(e,ev=>{ev.preventDefault();d.classList.remove('over')}));
+  d.addEventListener('drop',e=>pick(e.dataTransfer.files[0]));
+  document.addEventListener('paste',e=>{const it=[...e.clipboardData.items].find(i=>i.type.startsWith('image/'));if(it)pick(it.getAsFile())});
+  $('btnUp').onclick=()=>{
+    if(!file)return;$('btnUp').disabled=true;$('btnUp').textContent='Đang tải...';err('');
+    const fd=new FormData();fd.append('image',file,file.name||'image.png');
+    const x=new XMLHttpRequest();x.open('POST','/api/upload');
+    x.upload.onprogress=e=>{if(e.lengthComputable)$('prog').style.width=(e.loaded/e.total*90)+'%'};
+    x.onload=()=>{
+      $('btnUp').textContent='Tải lên';
+      let r;try{r=JSON.parse(x.responseText)}catch{r={error:'Phản hồi không hợp lệ'}}
+      if(x.status!==200||!r.id){$('btnUp').disabled=false;return err(r.error||'Tải lên thất bại')}
+      $('prog').style.width='100%';
+      const link=location.origin+'/?id='+r.id+'&i='+encodeURI(r.path);
+      $('lkView').value=link;$('lkId').value=r.id;$('lkDirect').value=r.url;$('open').href=link;
+      $('res').style.display='block';$('pv').style.display='none';
+    };
+    x.onerror=()=>{$('btnUp').disabled=false;$('btnUp').textContent='Tải lên';err('Lỗi kết nối mạng')};
+    x.send(fd);
+  };
+  document.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>copy($(b.dataset.c).value));
+}
+</script>
+</body>
+</html>

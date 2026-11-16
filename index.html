@@ -52,7 +52,9 @@
   }
   :root .toast svg{color:var(--success)}
 }
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+.photo,.photo img,.tile,.btn,.brand,.nav-links a,.lb img{-webkit-user-select:none;user-select:none}
+::selection{background:var(--accent-soft)}
 html{-webkit-text-size-adjust:100%;overflow-x:clip;scroll-behavior:smooth;scroll-padding-top:80px}
 body{font-family:var(--font);font-size:var(--fs-base);line-height:1.6;color:var(--text);background:var(--bg);min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased;font-feature-settings:"cv11","ss01","ss03"}
 button,input{font:inherit;color:inherit}
@@ -198,9 +200,9 @@ main{flex:1;display:flex;flex-direction:column}
 .section-h{display:flex;align-items:flex-end;justify-content:space-between;gap:var(--s-4);margin-bottom:var(--s-5)}
 .section-h h2{font-size:var(--fs-xl);font-weight:700;letter-spacing:-.035em;line-height:1.1}
 .section-h p{font-size:var(--fs-sm);color:var(--text-2);margin-top:6px}
-.grid{--cols:5;--gap:var(--s-4);display:grid;grid-template-rows:repeat(2,auto);grid-auto-flow:column;grid-auto-columns:calc((100% - (var(--cols) - 1)*var(--gap))/var(--cols));gap:var(--s-5) var(--gap);overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x proximity;padding-bottom:var(--s-3);scrollbar-width:thin}
-.grid .tile{scroll-snap-align:start}
+.grid{--gap:var(--s-4);display:flex;align-items:flex-start;gap:var(--gap)}
 .grid:empty{display:none}
+.mcol{flex:1 1 0;min-width:0;display:flex;flex-direction:column;gap:var(--s-4)}
 .tile{position:relative;display:block;min-width:0}
 .tile .im{aspect-ratio:4/5;border-radius:var(--r);overflow:hidden;background:var(--bg-2);border:1px solid var(--border);transition:border-color var(--t) var(--ease)}
 .tile:hover .im{border-color:var(--text)}
@@ -237,6 +239,7 @@ main{flex:1;display:flex;flex-direction:column}
 
 .aside{border-left:1px solid var(--border);background:var(--bg);display:flex;flex-direction:column;min-width:0}
 body.v .nav .container{max-width:none}
+body.v #navHist,body.v #topUp{display:none}
 .aside-in{min-height:calc(100dvh - var(--nav-h) - 1px);position:sticky;top:var(--nav-h);display:flex;flex-direction:column;gap:var(--s-6);padding:var(--s-6) var(--s-5);max-height:calc(100dvh - var(--nav-h));overflow:auto}
 .a-head small{display:block;font-size:var(--fs-xs);color:var(--text-2);font-weight:500}
 .a-head h1{font-size:22px;font-weight:700;letter-spacing:-.03em;line-height:1.25;margin-top:6px;word-break:break-word}
@@ -271,15 +274,30 @@ body.v .nav .container{max-width:none}
 .toast.on{opacity:1;transform:translate(-50%,0)}
 .toast svg{width:16px;height:16px;color:#7EE2A8;stroke-width:2.25}
 
-footer{border-top:1px solid var(--border)}
-footer .container{display:flex;justify-content:space-between;gap:var(--s-4);padding-top:var(--s-5);padding-bottom:var(--s-5);font-size:var(--fs-sm);color:var(--text-2)}
+/* ---------------- FOOTER — Editorial ---------------- */
+footer{border-top:1px solid var(--border);margin-top:auto;background:var(--bg)}
+footer .container{padding-top:var(--s-8);padding-bottom:var(--s-6)}
+.footer-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:var(--s-8);align-items:start}
+.footer-brand .brand{font-size:20px;margin-bottom:var(--s-3)}
+.footer-brand p{font-size:var(--fs-sm);color:var(--text-2);line-height:1.55;max-width:320px;margin:0}
+.footer-social{display:flex;flex-direction:column;gap:var(--s-4)}
+.footer-label{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--text-3)}
+.social-links{display:flex;flex-direction:column;gap:2px}
+.social-links a{display:flex;align-items:center;gap:12px;padding:10px 0;font-size:14px;font-weight:500;color:var(--text);border-bottom:1px solid transparent;transition:color var(--t) var(--ease),border-color var(--t) var(--ease)}
+.social-links a:hover{color:var(--accent);border-bottom-color:var(--border)}
+.social-links a svg{width:18px;height:18px;flex:none;stroke:currentColor;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+.social-links a svg path,.social-links a svg rect,.social-links a svg line,.social-links a svg circle{fill:none;stroke:currentColor}
+.social-links a .handle{color:var(--text-2);font-weight:400;font-size:13px;margin-left:auto}
+.social-links a:hover .handle{color:var(--accent)}
+.footer-bottom{display:flex;justify-content:space-between;align-items:center;gap:var(--s-4);margin-top:var(--s-7);padding-top:var(--s-5);border-top:1px solid var(--border);font-size:var(--fs-xs);color:var(--text-3)}
+.footer-bottom a{color:var(--text-2);transition:color var(--t)}
+.footer-bottom a:hover{color:var(--text)}
 body.v footer{display:none}
 
 /* ---------------- RESPONSIVE ---------------- */
 @media (min-width:1024px){ .canvas .zoomhint{display:flex} }
 @media (max-width:1023px){
   .hero{padding-top:var(--s-8)}
-  .grid{--cols:4}
   .empty{grid-template-columns:repeat(4,1fr)}
   .empty i:nth-child(5){display:none}
   .viewer{grid-template-columns:1fr;grid-template-rows:auto auto}
@@ -287,6 +305,7 @@ body.v footer{display:none}
   .aside{border-left:0;border-top:1px solid var(--border)}
   .aside-in{position:static;min-height:0;max-height:none;display:grid;grid-template-columns:1fr 1fr;grid-template-areas:"head head" "meta act" "pal act" "cta cta";align-items:start;gap:var(--s-5) var(--s-6)}
   .a-head{grid-area:head}#vMeta{grid-area:meta}#palWrap{grid-area:pal}.a-actions{grid-area:act}.a-cta{grid-area:cta}
+  .footer-grid{gap:var(--s-6)}
 }
 @media (max-width:767px){
   :root{--h-ctl:44px;--nav-h:56px}
@@ -310,14 +329,16 @@ body.v footer{display:none}
   .split .side{padding:var(--s-4)}
   .section{margin-top:var(--s-8);padding:var(--s-6) 0 var(--s-7)}
   .section-h h2{font-size:24px}
-  .grid{--cols:2.4;--gap:var(--s-3)}
+  .grid{--gap:var(--s-3)}
+  .mcol{gap:var(--s-3)}
   .empty{grid-template-columns:repeat(2,1fr);gap:var(--s-3)}
   .empty i:nth-child(n+3){display:none}
   .tile .x{opacity:1}
   .aside-in{display:flex;align-items:stretch;padding:var(--s-5) var(--s-4) var(--s-6);gap:var(--s-5)}
   .sw-hex{display:none}
   .a-head{order:1}.a-actions{order:2}#vMeta{order:3}#palWrap{order:4}.a-cta{order:5}
-  footer .container{flex-direction:column;gap:2px}
+  .footer-grid{grid-template-columns:1fr;gap:var(--s-6)}
+  .footer-bottom{flex-direction:column;align-items:flex-start;gap:6px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}html{scroll-behavior:auto}}
 </style>
@@ -405,7 +426,6 @@ body.v footer{display:none}
       <div class="meta-line">
         <span><svg class="i" data-i="image"></svg>JPG, PNG, GIF, WEBP, BMP</span>
         <span><svg class="i" data-i="hard-drive"></svg>Tối đa 32 MB</span>
-        <span><svg class="i" data-i="lock"></svg>Lưu trữ bởi ImgBB</span>
       </div>
     </section>
 
@@ -449,10 +469,6 @@ body.v footer{display:none}
           <label class="label" for="vLink" style="margin-bottom:0">Link chia sẻ</label>
           <div class="input-group"><svg class="i" data-i="link"></svg><input id="vLink" readonly><button class="btn btn-outline btn-sm" id="vCopy"><span>Sao chép</span></button></div>
           <a class="btn btn-primary btn-lg btn-block" id="vDl"><svg class="i" data-i="download"></svg><span>Tải xuống</span></a>
-          <div class="a-row">
-            <button class="btn btn-outline" id="vZoom"><svg class="i" data-i="maximize"></svg>Kích thước gốc</button>
-            <a class="btn btn-outline" id="vOrig" target="_blank" rel="noopener"><svg class="i" data-i="external"></svg>Ảnh gốc</a>
-          </div>
         </div>
         <div class="a-cta">
           <div><b>Bạn có ảnh muốn chia sẻ?</b>Miễn phí, không cần tài khoản.</div>
@@ -477,7 +493,38 @@ body.v footer{display:none}
 <div class="toast" id="toast" role="status"><svg class="i" data-i="check"></svg><span id="toastT"></span></div>
 
 <footer>
-  <div class="container"><span>© ImgShare</span><span>Ảnh lưu trữ bởi ImgBB · Vận hành trên Cloudflare Pages</span></div>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="/" class="brand" aria-label="Fantasy Beta – Trang chủ">Fantasy<span class="beta">Beta</span></a>
+        <p>Chia sẻ ảnh trong vài giây. Miễn phí, không cần tài khoản, không quảng cáo.</p>
+      </div>
+      <div class="footer-social">
+        <span class="footer-label">Theo dõi</span>
+        <div class="social-links">
+          <a href="https://www.threads.com/@kaiis.w" target="_blank" rel="noopener noreferrer" aria-label="Threads @kaiis.w">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z"/><path d="M9.2 9.8c.5-1.1 1.6-1.8 2.9-1.8 2 0 3.4 1.4 3.4 3.4 0 2.3-1.7 3.7-3.9 3.7-.5 0-1.1-.1-1.5-.3"/><path d="M8.5 14.8c.8 1.1 2 1.7 3.4 1.7 2.6 0 4.4-1.8 4.4-4.5 0-2.8-2-4.6-4.6-4.6-1.6 0-2.9.7-3.6 1.9"/></svg>
+            <span>Threads</span>
+            <span class="handle">@kaiis.w</span>
+          </a>
+          <a href="https://www.instagram.com/kaiis.w" target="_blank" rel="noopener noreferrer" aria-label="Instagram @kaiis.w">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
+            <span>Instagram</span>
+            <span class="handle">@kaiis.w</span>
+          </a>
+          <a href="mailto:vtuong2104@proton.me" aria-label="Email vtuong2104@proton.me">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+            <span>Email</span>
+            <span class="handle">vtuong2104@proton.me</span>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Fantasy</span>
+      <span>Thiết kế với sự tận tâm · Made for creators</span>
+    </div>
+  </div>
 </footer>
 
 <script>
@@ -542,7 +589,7 @@ const q=new URLSearchParams(location.search), ID=q.get('id');
 /* ======================= VIEWER ======================= */
 if(ID){
   document.body.classList.add('v');
-  $('up').style.display='none';$('view').style.display='grid';$('topUp').hidden=false;
+  $('up').style.display='none';$('view').style.display='grid';
   document.title='Ảnh '+ID+' · ImgShare';
   $('mId').textContent=ID;$('vLink').value=location.href;
 
@@ -584,14 +631,13 @@ if(ID){
     img.onload=()=>ready(img,name,!triedDirect);
     img.onerror=()=>{ if(!triedDirect){triedDirect=true;img.src=direct(path);$('vDl').href=direct(path);$('vDl').target='_blank'} else fail('Không tải được ảnh. Ảnh có thể đã bị xoá.') };
     img.src=proxy(path);
-    $('vOrig').href=direct(path);
     $('vDl').href=proxy(path)+'?dl=1';
   };
   const p=q.get('i');
   if(validPath(p)) show(p);
   else fetch('/api/image?id='+encodeURIComponent(ID)).then(r=>r.json()).then(d=>{
     if(d.path&&validPath(d.path))show(d.path);
-    else if(d.url){const img=$('vImg');img.onload=()=>ready(img,'',false);img.onerror=()=>fail();img.src=d.url;$('vOrig').href=d.url;$('vDl').href=d.url;$('vDl').target='_blank'}
+    else if(d.url){const img=$('vImg');img.onload=()=>ready(img,'',false);img.onerror=()=>fail();img.src=d.url;$('vDl').href=d.url;$('vDl').target='_blank'}
     else fail(d.error);
   }).catch(()=>fail('Lỗi kết nối, vui lòng thử lại.'));
 
@@ -600,7 +646,6 @@ if(ID){
   const closeLb=()=>{lb.classList.remove('show');document.body.style.overflow='';setTimeout(()=>lb.classList.remove('on'),180)};
   $('photo').onclick=()=>openLb(true);
   $('photo').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openLb(true)}};
-  $('vZoom').onclick=()=>openLb(false);
   $('lbImg').onclick=e=>{e.stopPropagation();lb.classList.toggle('fit')};
   lb.onclick=closeLb;$('lbX').onclick=e=>{e.stopPropagation();closeLb()};
   addEventListener('keydown',e=>{if(e.key==='Escape'&&lb.classList.contains('on'))closeLb()});
@@ -698,10 +743,14 @@ const renderH=()=>{
   $('histEmpty').hidden=h.length>0;$('clrHist').hidden=!h.length;
   $('histSub').textContent=h.length?h.length+' ảnh · lưu trên trình duyệt này, chỉ bạn nhìn thấy.':'Lưu trên trình duyệt này, chỉ bạn nhìn thấy.';
   setCount();
-  $('grid').innerHTML='';
+  const g=$('grid');g.innerHTML='';
+  const n=innerWidth<=767?2:innerWidth<=1023?4:5;
+  const cols=Array.from({length:n},()=>{const c=document.createElement('div');c.className='mcol';g.append(c);return{el:c,h:0}});
   h.forEach(it=>{
     const a=document.createElement('a');a.className='tile';a.href=shareLink(it.id,it.path,it.c);a.target='_blank';a.rel='noopener';a.title='Mở ảnh '+it.id;
     const box=document.createElement('div');box.className='im';
+    const rt=it.w>0&&it.h>0?Math.min(Math.max(it.h/it.w,.5),2):1.25;
+    box.style.aspectRatio=(1/rt).toFixed(4);
     const img=document.createElement('img');img.loading='lazy';img.alt='Ảnh '+it.id;
     const tp=it.thumb&&it.thumb.startsWith('https://i.ibb.co/')?it.thumb.slice(17):'';
     img.src=validPath(tp)?proxy(tp):it.thumb||proxy(it.path);
@@ -712,11 +761,14 @@ const renderH=()=>{
     const x=document.createElement('button');x.className='x';x.setAttribute('aria-label','Xoá khỏi lịch sử');x.title='Xoá khỏi lịch sử';
     x.innerHTML=icon('x');
     x.onclick=e=>{e.preventDefault();e.stopPropagation();setH(getH().filter(y=>y.id!==it.id));renderH()};
-    a.append(box,cap,x);$('grid').append(a);
+    a.append(box,cap,x);
+    const c=cols.reduce((m,k)=>k.h<m.h?k:m,cols[0]);c.el.append(a);c.h+=rt+.18;
   });
 };
 $('clrHist').onclick=()=>{setH([]);renderH();toast('Đã xoá lịch sử')};
 renderH();
+let lastN=innerWidth<=767?2:innerWidth<=1023?4:5;
+addEventListener('resize',()=>{const n=innerWidth<=767?2:innerWidth<=1023?4:5;if(n!==lastN){lastN=n;renderH()}});
 if(location.hash==='#lich-su')setTimeout(()=>$('lich-su').scrollIntoView(),50);
 })();
 </script>
